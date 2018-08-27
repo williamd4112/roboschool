@@ -63,6 +63,7 @@ class RoboschoolInvertedDoublePendulum(RoboschoolMujocoXmlEnv):
 
 class RoboschoolInvertedPendulum(RoboschoolMujocoXmlEnv):
     swingup = False
+    sparse = False
 
     def __init__(self):
         RoboschoolMujocoXmlEnv.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=5)
@@ -97,7 +98,14 @@ class RoboschoolInvertedPendulum(RoboschoolMujocoXmlEnv):
         state = self.calc_state()  # sets self.pos_x self.pos_y
         vel_penalty = 0
         if self.swingup:
-            reward = np.cos(self.theta)
+            if self.sparse:
+                cs = np.cos(self.theta)
+                if cs > 0.8:
+                    reward = 1.0
+                else:
+                    reward = 0.
+            else:
+                reward = np.cos(self.theta)
             done = False
         else:
             reward = 1.0
@@ -114,4 +122,8 @@ class RoboschoolInvertedPendulum(RoboschoolMujocoXmlEnv):
 
 class RoboschoolInvertedPendulumSwingup(RoboschoolInvertedPendulum):
     swingup = True
+
+class RoboschoolInvertedPendulumSwingupSparse(RoboschoolInvertedPendulum):
+    swingup = True
+    sparse = True
 
